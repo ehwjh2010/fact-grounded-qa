@@ -77,6 +77,11 @@ Do not:
 - Do not show evidence citations, evidence lists, or an `Evidence` section in the final answer.
 - Prefer direct evidence over documentary descriptions.
 - Separate what is verified from what is unknown.
+- Explain facts in plain language before showing exact code, configuration, or command text.
+- Use short identifiers, paths, keys, or one-line snippets only when they clarify the explanation.
+- Avoid pasting full functions, long configuration blocks, large diffs, or repeated code unless the user explicitly asks for exact source text.
+- When explaining code or configuration, connect the verified fact to a concrete user-facing meaning. For example: "`timeoutMs` is set to `30000`, so the configured timeout is 30 seconds."
+- Prefer practical examples that illustrate what the verified fact means, while making clear that the example itself is only an explanation unless it is directly evidenced.
 - If evidence is partial, say what is verified and list the rest under `Unknowns / Ambiguities / Unverified Points`.
 - If there are multiple fact-supported explanations, list them without selecting a winner unless the evidence directly establishes one.
 - Do not use words such as "probably", "likely", "should", "best", or "recommend" unless quoting evidence; these usually signal unsupported inference or decision-making.
@@ -116,45 +121,45 @@ Evidence must be gathered and checked before writing `Answer`, but it must not b
 
 These are illustrative examples only. Their paths, files, and behaviors are not facts about the current repository.
 
-### Fully Verifiable Question
+### Fully Verifiable Explanation
 
-User asks: "Which file defines the API route for creating invoices?"
+User asks: "What does the payment timeout setting mean?"
 
 ```markdown
 ## Answer
 
-The invoice creation route is defined in `src/routes/invoices.ts`, where `router.post("/invoices", createInvoice)` registers the POST handler.
+The payment timeout is configured as 30 seconds. In practical terms, a payment request using this setting is allowed to wait up to 30 seconds before the configured timeout is reached.
 
 ## Unknowns / Ambiguities / Unverified Points
 
-- Whether this route is enabled in production — Need environment-specific routing or deployment configuration evidence.
+- Whether production uses this same timeout value — Need environment-specific deployment configuration evidence.
 ```
 
-### Partially Verifiable Question
+### Partially Verifiable Explanation
 
-User asks: "Does checkout retry failed payments three times, and was that added last month?"
+User asks: "Does checkout retry failed payments, and when was that behavior added?"
 
 ```markdown
 ## Answer
 
-The current checkout code sets `maxAttempts` to `3` for payment retries. I cannot verify this from the available facts: whether the behavior was added last month.
+Checkout is configured to retry failed payments up to three times. This means one failed attempt can be followed by additional retry attempts until the configured retry limit is reached. I cannot verify this from the available facts: when the retry behavior was added.
 
 ## Unknowns / Ambiguities / Unverified Points
 
-- Whether the retry behavior was added last month — Need read-only git history for the relevant file and commits.
+- When the retry behavior was added — Need read-only git history for the relevant file and commits.
 ```
 
 ### Multiple Explanations Without Choosing
 
-User asks: "Should we migrate from the legacy queue to the new queue?"
+User asks: "Is the new queue already replacing the old queue?"
 
 ```markdown
 ## Answer
 
-I cannot choose whether to migrate. The repository contains both a legacy queue consumer and a new queue consumer. The legacy consumer is referenced by the current worker entrypoint. The new consumer is documented as experimental.
+The old queue is still used by the current worker entrypoint. The repository also contains a new queue, but the available documentation describes it as experimental. This means the repository contains evidence of both implementations, but the checked evidence does not show that the new queue has replaced the old one.
 
 ## Unknowns / Ambiguities / Unverified Points
 
-- Whether the new queue meets production requirements — Need verified test, load, reliability, and deployment evidence.
-- Whether migration is preferred by maintainers — Need explicit owner decision or accepted planning record.
+- Whether production has switched to the new queue outside this repository — Need deployment or runtime configuration evidence.
+- Whether maintainers intend to remove the old queue — Need an accepted planning record or owner decision.
 ```
